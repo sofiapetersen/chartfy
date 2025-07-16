@@ -52,14 +52,14 @@ const CollageGrid = ({ items, type, username }: CollageGridProps) => {
       link.click();
 
       toast({
-        title: "Download concluído!",
-        description: "Sua colagem foi baixada com sucesso.",
+        title: "Download is complete!",
+        description: "Your track collage was downloaded.",
       });
     } catch (error) {
       console.error("Erro ao fazer download:", error);
       toast({
-        title: "Erro no download",
-        description: "Não foi possível baixar a colagem. Tente novamente.",
+        title: "Erro during download",
+        description: "Could not download your track collage. Try again later.",
         variant: "destructive",
       });
     }
