@@ -6,7 +6,7 @@ interface LastfmItem {
 }
 
 // Chave de API pública do Last.fm (sem restrições para uso frontend)
-const LASTFM_API_KEY = "b25b959554ed76058ac220b7b2e0a026";
+const LASTFM_API_KEY = "SUA API AQUI";
 const LASTFM_BASE_URL = "https://ws.audioscrobbler.com/2.0/";
 
 export const getLastfmTopItems = async (

@@ -1,4 +1,4 @@
-const CLIENT_ID = "6dfadd3e12ea4bb8a498ca91bae0d7a5";
+const CLIENT_ID = "SUA API AQUI";
 const REDIRECT_URI = "https://chartfy.vercel.app/callback";
 const SPOTIFY_API = "https://accounts.spotify.com";
 const SCOPES = "user-top-read user-read-private";
