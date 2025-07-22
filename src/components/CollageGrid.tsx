@@ -15,7 +15,7 @@ interface LastfmItem {
 
 interface CollageGridProps {
   items: LastfmItem[];
-  type: "albums" | "tracks";
+  type: "albums" | "artists" | "tracks";
   username: string;
 }
 
@@ -52,14 +52,14 @@ const CollageGrid = ({ items, type, username }: CollageGridProps) => {
       link.click();
 
       toast({
-        title: "Download is complete!",
-        description: "Your track collage was downloaded.",
+        title: "Download complete!",
+        description: "Your chart has been downloaded successfully.",
       });
     } catch (error) {
       console.error("Erro ao fazer download:", error);
       toast({
-        title: "Erro during download",
-        description: "Could not download your track collage. Try again later.",
+        title: "Download error",
+        description: "Could not download the chart. Please try again.",
         variant: "destructive",
       });
     }
@@ -69,7 +69,7 @@ const CollageGrid = ({ items, type, username }: CollageGridProps) => {
     <Card className="bg-white/95 backdrop-blur-lg border-red-200 shadow-xl p-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-red-600 mb-2">
-          Top {type === "albums" ? "Albums" : "Musics"} - @{username}
+          Top {type === "albums" ? "Albums" : type === "artists" ? "Artists" : "Tracks"} - @{username}
         </h2>
         <Badge variant="secondary" className="bg-red-600 text-white">
           Last month
@@ -97,16 +97,19 @@ const CollageGrid = ({ items, type, username }: CollageGridProps) => {
                       <div
                         className="absolute inset-0"
                         style={{
-                          background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.2) 80%, transparent 100%)"
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.2) 80%, transparent 100%)",
                         }}
                       />
                       <div className="relative flex flex-col justify-end h-full text-white px-1 pb-[8px]">
                         <p className="text-[7px] font-semibold leading-tight whitespace-normal break-words text-left mb-[1px]">
                           {item.name}
                         </p>
-                        <p className="text-[6px] text-gray-300 leading-tight whitespace-normal break-words text-left">
-                          {item.artist}
-                        </p>
+                        {item.name !== item.artist && (
+                          <p className="text-[6px] text-gray-300 leading-tight whitespace-normal break-words text-left">
+                            {item.artist}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -121,92 +124,108 @@ const CollageGrid = ({ items, type, username }: CollageGridProps) => {
 
 
 
+
       {/* Grade visual para navegação - com hover effects e textos melhorados */}
       <div className="grid grid-cols-5 gap-2 max-w-2xl mx-auto">
-        {gridItems.slice(0, 25).map((item, index) => (
-          <div
-            key={index}
-            className="aspect-square relative group hover:scale-105 transition-transform duration-300"
-          >
-            {item.name ? (
-              <>
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={`${item.name} - ${item.artist}`}
-                  className="w-full h-full object-cover rounded-lg shadow-lg"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder.svg";
-                  }}
-                />
-                {/* Overlay com informações no hover */}
-                <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-center items-center p-2 text-center">
-                  <p className="text-white text-xs font-semibold mb-1 line-clamp-2 leading-tight">
-                    {item.name}
-                  </p>
-                  <p className="text-gray-300 text-xs mb-1 line-clamp-2 leading-tight">
-                    {item.artist}
-                  </p>
-                  <Badge variant="outline" className="text-xs px-1 py-0 bg-white/20 text-white border-white/40">
-                    {item.playcount} plays
-                  </Badge>
-                </div>
-                
-                {/* Nomes sempre visíveis quando ativados */}
-                {showNames && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent text-white p-1 rounded-b-lg">
-                    <p className="text-[10px] font-semibold leading-tight mb-0.5" 
-                       style={{ 
-                         display: '-webkit-box',
-                         WebkitLineClamp: 2,
-                         WebkitBoxOrient: 'vertical',
-                         overflow: 'hidden'
-                       }}>
-                      {item.name}
-                    </p>
-                    <p className="text-[9px] text-gray-300 leading-tight"
-                       style={{ 
-                         display: '-webkit-box',
-                         WebkitLineClamp: 1,
-                         WebkitBoxOrient: 'vertical',
-                         overflow: 'hidden'
-                       }}>
-                      {item.artist}
-                    </p>
+          {gridItems.slice(0, 25).map((item, index) => {
+            const isSame = item.name === item.artist;
+
+            return (
+              <div
+                key={index}
+                className="aspect-square relative group hover:scale-105 transition-transform duration-300"
+              >
+                {item.name ? (
+                  <>
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={`${item.name}${isSame ? "" : ` - ${item.artist}`}`}
+                      className="w-full h-full object-cover rounded-lg shadow-lg"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder.svg";
+                      }}
+                    />
+
+                    {/* Overlay com informações no hover */}
+                    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-center items-center p-2 text-center">
+                      <p className="text-white text-xs font-semibold mb-1 line-clamp-2 leading-tight">
+                        {item.name}
+                      </p>
+                      {!isSame && (
+                        <p className="text-gray-300 text-xs mb-1 line-clamp-2 leading-tight">
+                          {item.artist}
+                        </p>
+                      )}
+                      <Badge variant="outline" className="text-xs px-1 py-0 bg-white/20 text-white border-white/40">
+                        {item.playcount} plays
+                      </Badge>
+                    </div>
+
+                    {/* Nomes sempre visíveis quando ativados */}
+                    {showNames && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent text-white p-1 rounded-b-lg">
+                        <p
+                          className="text-[10px] font-semibold leading-tight mb-0.5"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {item.name}
+                        </p>
+                        {!isSame && (
+                          <p
+                            className="text-[9px] text-gray-300 leading-tight"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {item.artist}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-red-50 rounded-lg border border-red-200 flex items-center justify-center">
+                    <div className="text-red-400 text-xs">#{index + 1}</div>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="w-full h-full bg-red-50 rounded-lg border border-red-200 flex items-center justify-center">
-                <div className="text-red-400 text-xs">#{index + 1}</div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+
       
       <div className="text-center mt-6 space-y-4">
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           <Button
             onClick={() => setShowNames(!showNames)}
             variant="outline"
-            className="border-red-600 text-red-600 hover:bg-red-50"
+            className="border-red-600 text-red-600 hover:bg-red-50 w-full sm:w-auto"
           >
             {showNames ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
             {showNames ? "Hide info" : "Show info"}
           </Button>
           <Button
             onClick={downloadCollage}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 transition-all duration-300 hover:scale-105"
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
           >
             <Download className="w-4 h-4 mr-2" />
-            Download Track Collage
+            Download Track Chart
           </Button>
         </div>
         <p className="text-red-500 text-sm">
           Hover over the covers to see more details
         </p>
       </div>
+
     </Card>
   );
 };

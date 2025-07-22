@@ -10,7 +10,7 @@ const Index = () => {
             Chartfy
           </h1>
           <p className="text-xl text-red-700 animate-fade-in">
-            Create album and music track collages based on your Last.fm history!
+            Create charts of tracks, artists, and albums based on your Last.fm or Spotify history!
           </p>
         </div>
         
